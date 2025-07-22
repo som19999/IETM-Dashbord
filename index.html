@@ -8,6 +8,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome CDN for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Three.js CDN for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OBJLoader for loading .obj files -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <!-- OrbitControls for interactive camera -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link rel="stylesheet" href="css/search.css">
+    <script src="JS/search.js"></script>
+
     <style>
         /* Base styles for Inter font and background */
         body {
@@ -315,22 +324,24 @@
 
         /* Resizer Handle */
         .resizer {
-            width: 8px;
+            width: 1px;
             /* Thinner handle for better user experience */
-            cursor: col-resize;
+            cursor: pointer ;
             position: absolute;
             right: 0;
             top: 0;
             bottom: 0;
-            background-color: transparent;
+            /* background-color: transparent; */
             /* Invisible by default */
             z-index: 10;
             /* Ensure it's above other sidebar content */
+            overflow-y: auto;
         }
 
         .resizer:hover,
         .resizer.is-resizing {
-            background-color: #c0c0c0;
+            background-color: #0e0a0a; 
+         
             /* Light gray line when hovered/resizing */
         }
 
@@ -460,7 +471,7 @@
             /* Space below image */
         }
 
-        .image-download-btn {
+        .file-download-btn {
             position: absolute;
             bottom: 8px;
             right: 8px;
@@ -477,7 +488,8 @@
             transition: opacity 0.2s ease;
         }
 
-        .image-container:hover .image-download-btn {
+        .image-container:hover .file-download-btn,
+        .obj-viewer-container:hover .file-download-btn {
             opacity: 1;
         }
 
@@ -790,25 +802,82 @@
             background-color: #fef2f2;
             /* red-50 */
         }
+
+        /* Styles for 3D viewer container */
+        .obj-viewer-container {
+            width: 100%;
+            height: 400px;
+            /* Fixed height for the viewer */
+            background-color: #f0f0f0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .obj-viewer-container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .obj-viewer-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Highlight style for search results */
+        .highlight {
+            background-color: #ffeb3b; /* Yellow highlight */
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+
+        /* Clear button for search input */
+        .clear-button {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280; /* Gray-500 */
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.25rem;
+            border-radius: 50%; /* Make it round */
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            display: none; /* Hidden by default */
+            z-index: 10; /* Ensure button is above input */
+        }
+        .clear-button:hover {
+            background-color: #e2e8f0; /* Light gray on hover */
+            color: #4a5568; /* Darker gray on hover */
+        }
     </style>
 
 </head>
 
-<body class="p-4 sm:p-6 lg:p-8 flex items-center justify-center min-h-screen">
+<body >
 
     <!-- Main Application Container -->
-    <div id="appContainer"
-        class="max-w-7xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[calc(100vh-32px)] w-full flex flex-col hidden transition-all duration-300">
-
+   <div id="appContainer" class="bg-white rounded-xl shadow-xl flex flex-col w-full h-[calc(100vh-2rem)] sm:h-[calc(100vh-3rem)] lg:h-[calc(100vh-4rem)]">
         <!-- Header -->
         <header
-            class="flex flex-col sm:flex-row justify-between items-center bg-gradient-to-r from-blue-700 to-blue-900 text-white p-4 sm:p-6 shadow-lg z-10 rounded-t-xl">
-            <h1 id="appTitle" class="text-3xl font-extrabold mb-2 sm:mb-0 text-shadow">IETM Viewer</h1>
-            <div class="flex flex-wrap items-center space-x-2 sm:space-x-4 mt-2 sm:mt-0">
+          class="flex flex-col sm:flex-row justify-between items-center bg-[#FFF] text-gray-900 p-4 sm:p-6 shadow-lg z-10 rounded-t-xl">
+    <h1 id="appTitle" class="text-3xl font-extrabold mb-2 sm:mb-0 text-shadow">IETM Viewer</h1>
+    <div class="flex flex-wrap items-center space-x-2 sm:space-x-4 mt-2 sm:mt-0">
                 <!-- Page Navigation Buttons -->
                 <nav class="flex items-center space-x-2">
                     <button id="backBtn"
-                        class="p-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                        class="p-2 rounded-full bg-white-600  text-black transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                         title="Go Back">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -818,7 +887,7 @@
                         </svg>
                     </button>
                     <button id="forwardBtn"
-                        class="p-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                        class="p-2 rounded-full  bg-white-600  text-black transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                         title="Go Forward">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -828,7 +897,7 @@
                         </svg>
                     </button>
                     <button id="refreshBtn"
-                        class="p-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white transition duration-200 shadow-md hover:shadow-lg"
+                        class="p-2 rounded-full  bg-white-600  text-black transition duration-200 shadow-md hover:shadow-lg"
                         title="Refresh Page">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -845,7 +914,7 @@
                 <div class="flex items-center space-x-2 sm:space-x-4 mt-2 sm:mt-0">
                     <!-- Original Print Button -->
                     <button id="printBtn"
-                        class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-sm transition duration-200 shadow-md hover:shadow-lg"
+                        class=" bg-white-600  text-black px-3 py-1 rounded-lg text-sm transition duration-200 shadow-md hover:shadow-lg"
                         title="Print Current Page">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -860,7 +929,7 @@
 
                     <!-- Original Download Button (User-facing) -->
                     <button id="downloadBtn"
-                        class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-sm transition duration-200 shadow-md hover:shadow-lg"
+                        class=" bg-white-600  text-black px-3 py-1 rounded-lg text-sm transition duration-200 shadow-md hover:shadow-lg"
                         title="Download Current Page as HTML">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -874,7 +943,7 @@
 
                     <!-- New Full History Button (Visible to all users) -->
                     <button id="fullHistoryBtn"
-                        class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded-lg text-sm transition duration-200 shadow-md hover:shadow-lg"
+                        class="bg-white-600  text-blackx-3 py-1 rounded-lg text-sm transition duration-200 shadow-md hover:shadow-lg"
                         title="View Full Project History">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -888,7 +957,7 @@
 
                     <!-- Chat/Help/User Icons -->
                     <button id="chatBtn"
-                        class="p-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white transition duration-200 shadow-md hover:shadow-lg"
+                        class="p-2 rounded-full  bg-white-600  text-black transition duration-200 shadow-md hover:shadow-lg"
                         title="Open Chat">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -897,7 +966,7 @@
                         </svg>
                     </button>
                     <button id="helpBtn"
-                        class="p-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white transition duration-200 shadow-md hover:shadow-lg"
+                        class="p-2 rounded-full  bg-white-600  text-black transition duration-200 shadow-md hover:shadow-lg"
                         title="Help">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -918,36 +987,41 @@
 
         <div class="flex-1 flex flex-col lg:flex-row bg-gray-50">
             <!-- Left Sidebar: Tree View of Nodes -->
-            <aside id="sidebar" class="w-96 bg-gray-100 text-gray-800 p-6  flex-col overflow-y-auto relative">
+            <aside id="sidebar" class="w-96 bg-gray-100 text-gray-800 p-6  flex-col overflow-y-auto relative"  style="border: 1px solid black ;border-left: none;    
+ border-top: none;border-bottom: none;">
                 <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-4">Node Tree</h2>
                 <!-- Search Bar for Node Tree -->
                 <div class="relative mb-6">
-                    <input type="text" id="nodeTreeSearchInput" placeholder="Search tree..."
-                        class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200 shadow-sm" />
+                    <input type="text" id="nodeTreeSearchInput" placeholder="Search tree and content..."
+                        class="w-full pl-10 pr-10 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200 shadow-sm" />
                     <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <svg class="lucide-search" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        <svg class="lucide-search" width="10" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-search">
                             <circle cx="11" cy="11" r="8" />
                             <path d="m21 21-4.3-4.3" />
                         </svg>
                     </div>
+                    <!-- Clear button for the node tree search -->
+                    <button id="clearNodeTreeSearchButton" class="clear-button" title="Clear search">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <ul id="nodeTree" class="flex-grow space-y-1">
+                <ul id="nodeTree" class="flex-grow space-y-1" class="node-item" draggable="true">
                     <!-- Nodes will be rendered here recursively -->
                 </ul>
                 <div id="noNodesMessage" class="text-gray-500 text-sm text-center py-4 hidden">
                     No nodes yet.<br>Click "Add Root Folder" to start!
                 </div>
                 <!-- Resizer Handle -->
-                <div id="sidebarResizer" class="resizer"></div>
+                <div id="sidebarResizer" class="resizer   cursor: pointer"></div>
                 <!-- Admin controls for adding new modules (from main app) -->
                 <div id="adminControls" class="mt-8 pt-6 border-t border-gray-200 hidden">
                     <h3 class="text-lg font-semibold text-gray-700 mb-4">Admin Actions</h3>
                     <button id="addModuleBtn" class="text-black">
                         Add New Project
                     </button>
-
+ <p></p>
                     <button id="downloadRawXmlBtn" style="margin-top: 15px;">
                         Save as XML (File System API)
                     </button>
@@ -959,6 +1033,7 @@
                 <!-- Admin Action Buttons for Current Module (Edit/Delete) -->
 
                 <div id="currentModuleAdminActions" class="flex flex-wrap justify-end gap-3 mb-6 hidden">
+
                     <button id="editCurrentModuleBtn"
                         class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg text-sm transition duration-200 shadow-md transform hover:scale-105">
                         Edit Current Module
@@ -974,7 +1049,9 @@
                     </button>
 
                 </div>
+             
                 <!-- Content Display or Form for Admin -->
+  
                 <div id="contentDisplay" class=" p-6 justify-center items-center">
                     <div class="flex flex-col items-center justify-center h-full text-gray-500 text-lg text-center p-8">
 
@@ -984,10 +1061,10 @@
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                         </svg>
-                        <p class="text-xl font-medium text-gray-600">Welcome to your IETM Dashboard!</p>
-                        <p class="mt-2 text-gray-500 max-w-prose">Select a data module from the sidebar on the left to
+                        <p class="text-xl font-medium text-gray-600 " class="text-gray-700">Welcome to your IETM Dashboard!</p>
+                        <p class="mt-2 text-gray-500 max-w-prose" class="text-gray-700">Select a data module from the sidebar on the left to
                             view its content or manage it.</p>
-                        <p class="mt-4 text-sm text-gray-400 italic">"Knowledge at your fingertips."</p>
+                        <p class="mt-4 text-sm text-gray-400 italic" class="text-gray-700">"Knowledge at your fingertips."</p>
 
                     </div>
 
@@ -1057,6 +1134,23 @@
                             </div>
                         </div>
 
+                        <!-- 3D Model Upload Section -->
+                        <div class="mb-8 border p-5 rounded-xl bg-green-50 border-green-200 shadow-inner">
+                            <label for="objUploadInput" class="block text-green-800 text-base font-bold mb-3">
+                                Upload Local 3D Model (Optional - OBJ format):
+                                <span class="text-gray-500 font-normal text-xs ml-2">(Select a .obj file from your
+                                    computer)</span>
+                            </label>
+                            <input type="file" id="objUploadInput" accept=".obj"
+                                class="w-full text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-200 file:text-green-800 hover:file:bg-green-300 transition duration-200">
+                            <div id="objPreviewContainer" class="mt-5 hidden text-center">
+                                <span class="text-green-700 text-sm"></span>
+                                <button type="button" id="clearObjBtn"
+                                    class="text-red-600 hover:text-red-800 text-sm font-medium transition duration-200 py-1 px-2 rounded-md hover:bg-red-50 ml-4">Clear
+                                    OBJ File</button>
+                            </div>
+                        </div>
+
                         <div class="mb-8">
                             <div class="flex justify-between items-center mb-3">
                                 <label for="moduleContent" class="block text-gray-700 text-base font-semibold">
@@ -1083,28 +1177,32 @@
                         </div>
 
                         <!-- XML Content Section for User View (Auto-generated/Read-only for Admin) -->
-                        <div class="mb-8">
-                            <label for="xmlModuleContent"
-                                class="block text-gray-700 text-base font-semibold mb-2">Content (XML for User View -
-                                Auto-generated from HTML):</label>
-                            <textarea id="xmlModuleContent"
-                                class="shadow-sm appearance-none border border-gray-300 bg-gray-100 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 h-64 cursor-not-allowed w-full h-full min-h-[calc(100vh-180px)] flex-grow"
-                                readonly></textarea>
-                            <p class="text-sm text-gray-500 mt-2">This XML content is automatically generated from the
-                                HTML above and will be displayed to regular users in a formatted view.</p>
-                        </div>
-
-                        <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
-                            <button type="button" id="cancelFormBtn"
-                                class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-md transition duration-200 shadow-md transform hover:scale-105">Cancel</button>
-                            <button type="submit"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md transition duration-200 shadow-md transform hover:scale-105">Save
-                                Module</button>
-                        </div>
-                    </form>
+                        <div id="contentList" class="space-y-3">
+                            <div class="mb-8">
+                                <label for="xmlModuleContent"
+                                    class="block text-gray-700 text-base font-semibold mb-2">Content (XML for User View
+                                    -
+                                    Auto-generated from HTML):</label>
+                                <textarea id="xmlModuleContent"
+                                    class="shadow-sm appearance-none border border-gray-300 bg-gray-100 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 h-64 cursor-not-allowed w-full h-full min-h-[calc(100vh-180px)] flex-grow"
+                                    readonly></textarea>
+                                <p class="text-sm text-gray-500 mt-2">This XML content is automatically generated from
+                                    the
+                                    HTML above and will be displayed to regular users in a formatted view.</p>
+                            </div>
+                        </div>    <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                    <button type="button" id="cancelFormBtn"
+                        class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-md transition duration-200 shadow-md transform hover:scale-105">Cancel</button>
+                    <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md transition duration-200 shadow-md transform hover:scale-105">Save
+                        Module</button>
                 </div>
-            </main>
+                </div>
+            
+                </form>
         </div>
+        </main>
+    </div>
     </div>
 
     <!-- Login Container -->
@@ -1262,7 +1360,7 @@
                         <button id="cancelHotspotsBtn"
                             class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-md transition duration-200 shadow-md">Cancel</button>
                         <button id="saveHotspotsBtn"
-                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">Save
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">Save
                             Hotspots</button>
                     </div>
                 </div>
@@ -1301,7 +1399,7 @@
     </div>
 
     <!-- Full History Modal -->
-    <div id="fullHistoryModal" class="modal-overlay hidden">
+    <div id="fullHistoryModal" class="modal-overlay">
         <div class="modal-content !max-w-xl !p-6">
             <button class="modal-close-btn" id="closeFullHistoryModal">&times;</button>
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Full Project History</h2>
@@ -1318,13 +1416,123 @@
                 </select>
             </div>
             <ul id="historyList" class="max-h-96 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50 p-3">
-                <p id="noHistoryMessage" class="text-gray-500 italic text-center py-4 hidden">No history entries found.
+                <p id="noHistoryMessage" class="text-gray-500 italic text-center py-4">No history entries found.
                 </p>
                 <!-- History items will be dynamically loaded here -->
             </ul>
         </div>
-    </div>
+    </div> 
+    
     <script>
+        // --- Utility Functions for Highlighting ---
+
+        /**
+         * Recursively highlights occurrences of a search term within an HTML element.
+         * It replaces text nodes containing the term with a document fragment that wraps
+         * the matched parts in <span> tags with the 'highlight' class.
+         * @param {HTMLElement} element The DOM element to search within.
+         * @param {string} searchTerm The text to highlight (case-insensitive).
+         */
+        function highlightTextInElement(element, searchTerm) {
+            // Remove any existing highlights first to prevent nested or stale highlights
+            removeHighlightingFromElement(element);
+
+            if (!searchTerm) {
+                return; // No search term, no highlighting needed
+            }
+
+            // Create a case-insensitive, global regular expression from the search term
+            // Escape special regex characters in the search term
+            const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+
+            /**
+             * Recursive helper function to traverse the DOM and apply highlighting.
+             * @param {Node} node The current DOM node being processed.
+             */
+            function traverseAndHighlight(node) {
+                // Process text nodes
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    const matches = [];
+                    let match;
+                    // Find all matches in the text node
+                    while ((match = regex.exec(text)) !== null) {
+                        matches.push({
+                            start: match.index,
+                            end: regex.lastIndex,
+                            text: match[0]
+                        });
+                    }
+
+                    if (matches.length > 0) {
+                        const fragment = document.createDocumentFragment();
+                        let lastIndex = 0;
+
+                        matches.forEach(m => {
+                            // Append text before the current match
+                            if (m.start > lastIndex) {
+                                fragment.appendChild(document.createTextNode(text.substring(lastIndex, m.start)));
+                            }
+
+                            // Append the highlighted span
+                            const span = document.createElement('span');
+                            span.className = 'highlight';
+                            span.textContent = m.text;
+                            fragment.appendChild(span);
+
+                            lastIndex = m.end;
+                        });
+
+                        // Append any remaining text after the last match
+                        if (lastIndex < text.length) {
+                            fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+                        }
+
+                        // Replace the original text node with the new fragment
+                        node.parentNode.replaceChild(fragment, node);
+                    }
+                }
+                // Process element nodes (and skip certain tags/classes)
+                else if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Skip elements that should not be searched/highlighted
+                    if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE' ||
+                        node.classList.contains('annotation-tooltip') || // Don't highlight inside tooltips
+                        node.classList.contains('rendered-hotspot') || // Don't highlight inside hotspot overlays
+                        node.classList.contains('obj-viewer-container') || // Don't highlight inside 3D viewer
+                        node.classList.contains('highlight') // Don't re-process already highlighted spans
+                    ) {
+                        return;
+                    }
+
+                    // Recursively traverse children
+                    for (let i = 0; i < node.childNodes.length; i++) {
+                        traverseAndHighlight(node.childNodes[i]);
+                    }
+                }
+            }
+
+            traverseAndHighlight(element);
+        }
+
+        /**
+         * Removes all 'highlight' spans from within a given HTML element, restoring original text.
+         * @param {HTMLElement} element The DOM element from which to remove highlights.
+         */
+        function removeHighlightingFromElement(element) {
+            const highlights = element.querySelectorAll('span.highlight');
+            highlights.forEach(span => {
+                // Replace the span with its text content
+                const parent = span.parentNode;
+                while (span.firstChild) {
+                    parent.insertBefore(span.firstChild, span);
+                }
+                parent.removeChild(span);
+                // Normalize the parent node to merge adjacent text nodes back together
+                parent.normalize();
+            });
+        }
+
+
         // --- Hardcoded User Data (Simulated) ---
         const USERS = {
             'user': {
@@ -1349,6 +1557,7 @@
         const appTitle = document.getElementById('appTitle'); // Get the h1 element for the title
 
         const nodeTreeSearchInput = document.getElementById('nodeTreeSearchInput'); // New search input for node tree
+        const clearNodeTreeSearchButton = document.getElementById('clearNodeTreeSearchButton'); // New clear button
         const nodeTree = document.getElementById('nodeTree'); // Node tree list
         const noNodesMessage = document.getElementById('noNodesMessage'); // No nodes message
         const sidebar = document.getElementById('sidebar'); // Sidebar for resizing
@@ -1370,6 +1579,9 @@
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
         const clearImageBtn = document.getElementById('clearImageBtn');
         const openHotspotEditorBtn = document.getElementById('openHotspotEditorBtn'); // New Hotspot button
+        const objUploadInput = document.getElementById('objUploadInput'); // New OBJ file input
+        const objPreviewContainer = document.getElementById('objPreviewContainer'); // New OBJ preview container
+        const clearObjBtn = document.getElementById('clearObjBtn'); // New clear OBJ button
         const moduleContentInput = document.getElementById('moduleContent');
         const xmlModuleContentInput = document.getElementById('xmlModuleContent'); // XML Content Input
         const insertImageBtn = document.getElementById('insertImageBtn');
@@ -1382,7 +1594,7 @@
         const editCurrentModuleBtn = document.getElementById('editCurrentModuleBtn');
         const deleteCurrentModuleBtn = document.getElementById('deleteCurrentModuleBtn');
         const downloadRawHtmlBtn = document.getElementById('downloadRawHtmlBtn'); // New button
-        const downloadRawXmlBtn = document.getElementById('downloadRawXmlBtn'); // New button
+        const downloadRawXmlBtn = document = document.getElementById('downloadRawXmlBtn'); // New button
 
         // Page Navigation Elements
         const backBtn = document.getElementById('backBtn');
@@ -1449,6 +1661,7 @@
         let currentUser = null; // Stores { username, role }
         let selectedModuleId = null; // Currently selected data module
         let currentImageBase64 = null; // Stores the Base64 string of the uploaded primary image
+        let currentObjBase64 = null; // Stores the Base64 string of the uploaded OBJ model
         let currentHotspots = []; // Hotspots for the module currently being edited
         let drawingRect = null; // { startX, startY, currentX, currentY } for drawing
         let isDrawing = false;
@@ -1458,6 +1671,9 @@
         // Variables for node tree context menu (from sample2.html)
         let rightClickedNodeId = null; // Store ID of the node that was right-clicked
         let activeNodeHeaderElement = null; // Store the tree-item-header that was right-clicked
+
+        // Three.js related global variables
+        let scene, camera, renderer, controls, currentObjMesh;
 
 
         // History for back/forward navigation
@@ -1475,7 +1691,8 @@
         dataModules = dataModules.map(module => ({
             ...module,
             isOpen: module.isOpen !== undefined ? module.isOpen : false, // Default to closed
-            isHighlighted: module.isHighlighted !== undefined ? module.isHighlighted : false // Default to not highlighted
+            isHighlighted: module.isHighlighted !== undefined ? module.isHighlighted : false, // Default to not highlighted
+            objData: module.objData !== undefined ? module.objData : null // Initialize objData for Base64 OBJ
         }));
 
 
@@ -1868,11 +2085,24 @@
                     contentHtml += `<hr class="my-4 border-gray-200">`;
                 }
 
+                // Add 3D model viewer if objData (Base64) is present
+                if (module.objData) {
+                    contentHtml += `
+                        <h3 class="text-lg font-semibold mt-4 mb-2">3D Model (Admin View):</h3>
+                        <div id="objViewerContainer" class="obj-viewer-container">
+                            <div class="obj-viewer-loading">Loading 3D Model...</div>
+                        </div>
+                        <button class="file-download-btn bg-gray-700 hover:bg-gray-800" title="Download OBJ" data-file-data="${module.objData}" data-file-name="${module.title.replace(/[^a-zA-Z0-9]/g, '_')}.obj" data-file-type="obj">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        </button>
+                    `;
+                }
+
                 if (module.imageUrl) {
                     contentHtml += `
                         <div class="image-container relative">
                             <img id="primaryModuleImage" src="${module.imageUrl}" alt="${module.title} Image" class="block max-w-full h-auto rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x300/CCCCCC/666666?text=Main+Image+Failed+to+Load';">
-                            <button class="image-download-btn" title="Download Image" data-image-src="${module.imageUrl}" data-image-alt="${module.title.replace(/[^a-zA-Z0-9]/g, '_')}">
+                            <button class="file-download-btn" title="Download Image" data-file-data="${module.imageUrl}" data-file-name="${module.title.replace(/[^a-zA-Z0-9]/g, '_')}.png" data-file-type="image">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                             </button>
                         </div>
@@ -1899,20 +2129,33 @@
 
                 contentDisplay.innerHTML = contentHtml;
 
+                // Get the actual div where content is rendered AFTER it's been populated
                 const readableContentDiv = contentDisplay.querySelector('#readableContent');
                 if (readableContentDiv) {
+                    // Apply highlighting based on the current search term from the node tree search input
+                    highlightTextInElement(readableContentDiv, nodeTreeSearchInput.value);
                     readableContentDiv.addEventListener('click', handleHotspotClick);
                     if (currentUser && currentUser.role === 'admin') {
                         readableContentDiv.addEventListener('mouseup', handleTextSelection);
                     }
                 }
 
-                contentDisplay.querySelectorAll('.image-download-btn').forEach(button => {
+
+                // Initialize 3D viewer if OBJ Data exists
+                if (module.objData) {
+                    const objViewerContainer = contentDisplay.querySelector('#objViewerContainer');
+                    if (objViewerContainer) {
+                        init3DViewer(objViewerContainer, module.objData);
+                    }
+                }
+
+                contentDisplay.querySelectorAll('.file-download-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        const imgSrc = e.currentTarget.dataset.imageSrc;
-                        const imgAlt = e.currentTarget.dataset.imageAlt || 'image';
-                        downloadImage(imgSrc, imgAlt);
+                        const fileData = e.currentTarget.dataset.fileData;
+                        const fileName = e.currentTarget.dataset.fileName;
+                        const fileType = e.currentTarget.dataset.fileType;
+                        downloadFile(fileData, fileName, fileType);
                     });
                 });
 
@@ -2004,11 +2247,12 @@
          * Converts a data URL (Base64) to a Blob object.
          * From: https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
          * @param {string} dataurl The data URL (e.g., "data:image/png;base64,...")
+         * @param {string} type The MIME type of the data (e.g., "image/png", "model/obj").
          * @returns {Blob} The Blob object.
          */
-        function dataURLtoBlob(dataurl) {
+        function dataURLtoBlob(dataurl, type) {
             const arr = dataurl.split(',');
-            const mime = arr[0].match(/:(.*?);/)[1];
+            // const mime = arr[0].match(/:(.*?);/)[1]; // This is not reliable if the dataurl doesn't have it
             const bstr = atob(arr[1]);
             let n = bstr.length;
             const u8arr = new Uint8Array(n);
@@ -2016,40 +2260,47 @@
                 u8arr[n] = bstr.charCodeAt(n);
             }
             return new Blob([u8arr], {
-                type: mime
+                type: type
             });
         }
 
 
         /**
-         * Downloads an image from a given URL or Base64 string.
-         * This function saves the image to the user's local file system.
+         * Downloads a file from a given URL or Base64 string.
+         * This function saves the file to the user's local file system.
          * The exact "location" (folder) is chosen by the user via their browser's download prompt.
-         * @param {string} imageUrl The URL or Base64 data URI of the image.
-         * @param {string} suggestedFileName A suggested filename (without extension).
+         * @param {string} fileData The URL or Base64 data URI of the file.
+         * @param {string} suggestedFileName A suggested filename (with extension).
+         * @param {string} fileType 'image' or 'obj' to determine MIME type.
          */
-        async function downloadImage(imageUrl, suggestedFileName = 'image') {
+        async function downloadFile(fileData, suggestedFileName, fileType) {
             try {
                 let blob;
                 let mimeType;
 
-                if (imageUrl.startsWith('data:')) {
-                    // It's a Base64 data URI
-                    blob = dataURLtoBlob(imageUrl);
-                    mimeType = blob.type;
-                } else {
-                    // It's a regular URL, fetch it
-                    const response = await fetch(imageUrl);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                if (fileType === 'obj') {
+                    mimeType = 'model/obj'; // Explicitly set for OBJ
+                    blob = dataURLtoBlob(fileData, mimeType);
+                } else if (fileType === 'image') {
+                    // If it's a Base64 data URI, extract MIME type from it
+                    if (fileData.startsWith('data:image/')) {
+                        mimeType = fileData.match(/:(.*?);/)[1];
+                        blob = dataURLtoBlob(fileData, mimeType);
+                    } else {
+                        // It's a regular URL, fetch it
+                        const response = await fetch(fileData);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        blob = await response.blob();
+                        mimeType = blob.type;
                     }
-                    blob = await response.blob();
-                    mimeType = blob.type;
+                } else {
+                    displayTemporaryMessage('Unsupported file type for download.', 'error');
+                    return;
                 }
 
-                // Determine file extension from MIME type
-                const extension = mimeType.split('/')[1] || 'png'; // Default to png if unknown
-                const filename = `${suggestedFileName}.${extension}`;
+                const filename = suggestedFileName; // Filename already includes extension
 
                 // Create a temporary anchor element and trigger download
                 const url = URL.createObjectURL(blob);
@@ -2064,8 +2315,8 @@
                 displayTemporaryMessage(`Downloaded "${filename}". Your browser prompted you for a save location.`,
                     'success');
             } catch (error) {
-                console.error('Error downloading image:', error);
-                displayTemporaryMessage(`Failed to download image: ${error.message}.`, 'error');
+                console.error('Error downloading file:', error);
+                displayTemporaryMessage(`Failed to download file: ${error.message}.`, 'error');
             }
         }
 
@@ -2194,6 +2445,10 @@
             openHotspotEditorBtn.disabled = true; // Disable until image is uploaded
             currentImageBase64 = null; // Clear stored Base64
             currentHotspots = []; // Clear hotspots for new module
+            objUploadInput.value = ''; // Clear OBJ file input
+            objPreviewContainer.classList.add('hidden'); // Hide OBJ preview container
+            objPreviewContainer.querySelector('span').textContent = ''; // Clear OBJ preview text
+            currentObjBase64 = null; // Clear stored OBJ Base64
 
             // Reset parent selection and then populate for new entry
             parentTopicSelect.value = '';
@@ -2270,6 +2525,19 @@
                     currentImageBase64 = null;
                 }
                 imageUploadInput.value = ''; // Clear file input so user can pick a new one
+
+                // Handle existing OBJ Data for editing
+                if (moduleToEdit.objData) {
+                    objPreviewContainer.classList.remove('hidden');
+                    objPreviewContainer.querySelector('span').textContent = `Local OBJ file selected.`; // No filename stored, just indication
+                    currentObjBase64 = moduleToEdit.objData;
+                } else {
+                    objUploadInput.value = ''; // Clear file input
+                    objPreviewContainer.classList.add('hidden');
+                    objPreviewContainer.querySelector('span').textContent = '';
+                    currentObjBase64 = null;
+                }
+
 
                 populateParentTopicSelect(); // Populate all options first
 
@@ -2353,6 +2621,7 @@
                             serialNumber: serialNumber, // Save serial number (part of "location wise" ordering)
                             functionTopicName: functionTopicName,
                             imageUrl: currentImageBase64, // Save current Base64 image
+                            objData: currentObjBase64, // Save OBJ Base64 data
                             content, // Save HTML content from textarea
                             xmlContent, // Save XML content from textarea
                             parentId: parentId, // Save parentId (crucial for "location wise" hierarchy)
@@ -2378,6 +2647,7 @@
                     serialNumber: serialNumber, // Save serial number
                     functionTopicName: functionTopicName,
                     imageUrl: currentImageBase64, // Save current Base64 image
+                    objData: currentObjBase64, // Save OBJ Base64 data
                     content, // Save HTML content from textarea
                     xmlContent, // Save XML content from textarea
                     parentId: parentId, // Save parentId
@@ -2409,6 +2679,7 @@
         function deleteModule(id) {
             const modulesToDelete = [id]; // Start with the module itself
             const moduleToDeleteData = dataModules.find(m => m.id === id); // Get data for history
+            const deletedModuleTitle = moduleToDeleteData ? moduleToDeleteData.title : 'Unknown Module';
 
             // Find all direct children to delete recursively
             const findChildrenToDelete = (parentId) => {
@@ -2424,8 +2695,8 @@
             dataModules = dataModules.filter(m => !modulesToDelete.includes(m.id));
             saveModules(); // Persist the updated dataModules array to localStorage
             // Add to history
-            addHistoryEntry('delete', id, moduleToDeleteData ? moduleToDeleteData.title : 'Unknown Module',
-                `Deleted module "${moduleToDeleteData ? moduleToDeleteData.title : 'Unknown Module'}" and its ${modulesToDelete.length - 1} sub-modules.`
+            addHistoryEntry('delete', id, deletedModuleTitle,
+                `Deleted module "${deletedModuleTitle}" and its ${modulesToDelete.length - 1} sub-modules.`
             );
 
 
@@ -2481,6 +2752,17 @@
                 historyIndex++;
                 handleModuleSelect(moduleHistory[historyIndex], true); // true to indicate from history
             }
+            // Ensure the 3D viewer is reset if navigating to a module that doesn't have a model
+            if (selectedModuleId && !dataModules.find(m => m.id === selectedModuleId)?.objData) {
+                if (renderer) {
+                    renderer.dispose();
+                    scene = null;
+                    camera = null;
+                    renderer = null;
+                    controls = null;
+                    currentObjMesh = null;
+                }
+            }
         }
 
         /**
@@ -2527,7 +2809,7 @@
             let contentToPrintHtml = '';
             // For printing, we always want the user-facing formatted content
             try {
-                contentToPrintHtml = renderXmlAsHtml(module.xmlContent);
+                contentToPrintHtml = renderXmlAsHtml(module.xmlContent); // objData is handled within renderXmlAsHtml
             } catch (e) {
                 displayTemporaryMessage(`Error preparing XML for print: ${e.message}`, 'error');
                 return;
@@ -2612,7 +2894,7 @@
                             border: 1px solid #eee;
                             page-break-inside: avoid; /* Keep image on one page */
                         }
-                        .note-caution, .note-warning {
+                        .note-info, .note-caution, .note-warning {
                             border: 1px solid #ccc;
                             border-left: 5px solid;
                             padding: 1em 1.2em;
@@ -2622,6 +2904,7 @@
                             color: #000000 !important;
                             border-radius: 5px;
                         }
+                        .note-info { border-left-color: #3b82f6 !important; }
                         .note-caution { border-left-color: #f6ad55 !important; }
                         .note-warning { border-left-color: #ef4444 !important; }
 
@@ -2686,7 +2969,7 @@
 
                 // Users always download the formatted XML content as HTML
                 try {
-                    contentToDownload = renderXmlAsHtml(module.xmlContent);
+                    contentToDownload = renderXmlAsHtml(module.xmlContent); // objData is handled within renderXmlAsHtml
                 } catch (e) {
                     displayTemporaryMessage(`Error preparing XML for download: ${e.message}`, 'error');
                     return;
@@ -2788,7 +3071,7 @@
                                 'text/xml': ['.xml'],
                                 'application/xml': ['.xml']
                             },
-                        },],
+                        }, ],
                     };
 
                     const handle = await window.showSaveFilePicker(options);
@@ -2878,7 +3161,7 @@
          * @param {function} onConfirm Callback function if user confirms.
          * @param {function} onCancel Callback function if user cancels (optional).
          */
-        function displayConfirmMessageBox(message, onConfirm, onCancel = () => { }) {
+        function displayConfirmMessageBox(message, onConfirm, onCancel = () => {}) {
             const overlay = document.createElement('div');
             overlay.className = 'message-box-overlay';
             overlay.innerHTML = `
@@ -2993,6 +3276,47 @@
             } else {
                 showLoginScreen();
             }
+
+            // Add a sample module if none exist for demonstration
+            if (dataModules.length === 0) {
+                dataModules.push({
+                    id: 'main-project',
+                    title: 'Sample Project',
+                    serialNumber: '1',
+                    functionTopicName: 'Overview',
+                    imageUrl: '',
+                    objData: '',
+                    content: '<p>This is a sample project module. You can add more content here. For details on system updates, please refer to the <span data-hotspot="sample-module-id">System Updates Documentation</span>.</p>',
+                    xmlContent: '', // Will be generated on save
+                    parentId: null,
+                    level: 0,
+                    isOpen: true,
+                    isHighlighted: false,
+                    hotspots: [],
+                    annotations: []
+                });
+                dataModules.push({
+                    id: 'sample-module-id',
+                    title: 'System Updates Documentation',
+                    serialNumber: '1.1',
+                    functionTopicName: null,
+                    imageUrl: '',
+                    objData: '',
+                    content: '<p>This page contains important information about system updates. This is an example of an inner topic link.</p>',
+                    xmlContent: '', // Will be generated on save
+                    parentId: 'main-project',
+                    level: 1,
+                    isOpen: true,
+                    isHighlighted: false,
+                    hotspots: [],
+                    annotations: []
+                });
+                saveModules();
+                addHistoryEntry('add', 'main-project', 'Sample Project', 'Added initial sample project.');
+                addHistoryEntry('add', 'sample-module-id', 'System Updates Documentation', 'Added sample documentation module.');
+            }
+            // Temporarily alert user about the new sample link
+            displayTemporaryMessage('A sample internal link has been added to the "Sample Project" module (visible in Admin view).', 'info', 7000);
         }
 
         // --- S1000D Helper Function ---
@@ -3064,6 +3388,12 @@
                 }
             }
 
+            // Add 3D model tag if objData (Base64) is present
+            if (currentModuleData && currentModuleData.objData) {
+                // Warning: Embedding large Base64 strings directly in XML can make the XML file very large.
+                xmlOutput += `    <model3d src="${currentModuleData.objData}"/>\n`;
+            }
+
 
             xmlOutput += '    <title>Module Title Placeholder</title>\n    <content>\n';
 
@@ -3117,7 +3447,13 @@
                                 const targetModuleId = node.getAttribute('data-hotspot');
                                 const s1000dAttrs = getS1000DAttributesForModule(targetModuleId);
                                 nodeXml +=
-                                    `<link target="${targetModuleId}" dmc="${s1000dAttrs.dmc}" issue="${s1000dAttrs.issue}" title="${escapeXmlAttribute(s1000dAttrs.title)}">`;
+                                    `<link target="${targetModuleId}" dmc="${s1000dAttrs.dmc}" issue="${s1000dAttrs.issue}" title="${escapeXmlAttribute(s1000dAttrs.title)}"`;
+                                // Add tooltip if present in the data-hotspot span
+                                const tooltip = node.getAttribute('title');
+                                if (tooltip) {
+                                    nodeXml += ` tooltip="${escapeXmlAttribute(tooltip)}"`;
+                                }
+                                nodeXml += `>`;
                                 nodeXml += processChildren(node, indentLevel + 1, false); // Content of the link tag is the visible text
                                 nodeXml += `</link>`;
                             } else if (node.classList.contains('annotated-text')) {
@@ -3250,12 +3586,25 @@
                 return `<p class="text-red-500 font-semibold">Error parsing XML content. Please check the XML syntax.</p><pre>${escapeHtml(xmlString)}</pre>`;
             }
 
-            const contentNode = xmlDoc.querySelector('module > content');
-            if (!contentNode) {
-                return '<p class="text-gray-500 italic">No content found in XML module.</p>';
+            let htmlOutput = '';
+
+            // Render primary 3D model placeholder if present in the XML root
+            const model3dNode = xmlDoc.querySelector('module > model3d');
+            if (model3dNode && model3dNode.getAttribute('src')) {
+                htmlOutput += `
+                    <h3 class="text-lg font-semibold mt-4 mb-2">3D Model:</h3>
+                    <div class="obj-viewer-container">
+                        <p class="text-gray-600">Interactive 3D model available in Admin view. For user view, model is indicated here.</p>
+                        <p class="text-sm text-gray-500">Local Model (Admin View Only)</p>
+                    </div>
+                `;
             }
 
-            let htmlOutput = '';
+
+            const contentNode = xmlDoc.querySelector('module > content');
+            if (!contentNode) {
+                return htmlOutput + '<p class="text-gray-500 italic">No content found in XML module.</p>';
+            }
 
             const traverseAndRender = (node) => {
                 let nodeHtml = '';
@@ -3287,8 +3636,9 @@
                             const dmc = node.getAttribute('dmc') || 'N/A';
                             const issue = node.getAttribute('issue') || 'N/A';
                             const title = node.getAttribute('title') || 'Linked Module';
+                            const tooltip = node.getAttribute('tooltip') || ''; // Get tooltip from XML
                             // Use data-dmc and data-issue for print CSS to pick up
-                            nodeHtml += `<span class="hotspot-link" data-hotspot="${target}" data-dmc="${dmc}" data-issue="${issue}" title="Link to ${title} (DMC: ${dmc}, Issue: ${issue})">${traverseAndRenderChildren(node)}</span>`;
+                            nodeHtml += `<span class="hotspot-link" data-hotspot="${target}" data-dmc="${dmc}" data-issue="${issue}" title="Link to ${tooltip || title} (DMC: ${dmc}, Issue: ${issue})">${traverseAndRenderChildren(node)}</span>`;
                             break;
                         case 'inline_image': // Render inline images in content
                             const src = node.getAttribute('src');
@@ -3296,7 +3646,7 @@
                             nodeHtml += `
                                 <div class="image-container">
                                     <img src="${src}" alt="${alt}" onerror="this.onerror=null;this.src='https://placehold.co/600x300/CCCCCC/666666?text=Image+Failed+to+Load';" class="max-w-full h-auto rounded-lg">
-                                    <button class="image-download-btn" title="Download Image" data-image-src="${src}" data-image-alt="${alt.replace(/[^a-zA-Z0-9]/g, '_')}">
+                                    <button class="file-download-btn" title="Download Image" data-file-data="${src}" data-file-name="${alt.replace(/[^a-zA-Z0-9]/g, '_')}.png" data-file-type="image">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                                     </button>
                                 </div>
@@ -3361,6 +3711,7 @@
                             break;
                         case 'image': // Main module image - handled by renderContent directly
                         case 'hotspots': // Hotspots - handled by renderContent directly
+                        case 'model3d': // Main module 3D model - handled by renderContent directly
                             break;
                         default:
                             // For unknown elements, try to render their children
@@ -3381,7 +3732,7 @@
                 return childrenHtml;
             };
 
-            htmlOutput = traverseAndRender(contentNode);
+            htmlOutput += traverseAndRender(contentNode);
             return htmlOutput;
         }
 
@@ -3584,6 +3935,11 @@
                 resizeCanvasToImage();
                 drawHotspotsOnCanvas();
             }
+            // Also handle resize for the main OBJ viewer if it's active
+            const objViewerContainer = document.getElementById('objViewerContainer');
+            if (objViewerContainer && objViewerContainer.contains(renderer.domElement)) {
+                onWindowResize();
+            }
         });
 
 
@@ -3770,7 +4126,7 @@
                 return;
             }
 
-            const uniqueId = generateAnnotationId(); // Generate a unique ID for this annotation
+            const uniqueId = generateAnnotationId();
             const annotator = currentUser ? currentUser.username : 'Guest';
             const timestamp = new Date().toISOString();
 
@@ -4012,10 +4368,46 @@
         //     }
         // });
 
-        // Search Modules in Sidebar (now for node tree)
-        nodeTreeSearchInput.addEventListener('input', (event) => {
-            renderModuleList(event.target.value);
+        // --- Global Search and Highlight Logic ---
+        /**
+         * Orchestrates the global search, filtering the node tree and highlighting content.
+         */
+        function updateGlobalSearchAndHighlight() {
+            const searchTerm = nodeTreeSearchInput.value.toLowerCase().trim();
+
+            // 1. Filter and render the node tree in the sidebar
+            renderModuleList(searchTerm);
+
+            // 2. Apply highlighting to the currently displayed module content
+            if (selectedModuleId) {
+                // Re-render the content first to ensure it's fresh (removes old highlights)
+                renderContent(selectedModuleId);
+            } else {
+                // If no module is selected, ensure any existing highlights in the default content are removed
+                const readableContentDiv = contentDisplay.querySelector('#readableContent');
+                if (readableContentDiv) {
+                    removeHighlightingFromElement(readableContentDiv);
+                }
+            }
+
+            // 3. Show/hide clear button
+            if (searchTerm.length > 0) {
+                clearNodeTreeSearchButton.style.display = 'block';
+            } else {
+                clearNodeTreeSearchButton.style.display = 'none';
+            }
+        }
+
+        // Event listener for the node tree search input (now global search)
+        nodeTreeSearchInput.addEventListener('input', updateGlobalSearchAndHighlight);
+
+        // Event listener for the clear search button
+        clearNodeTreeSearchButton.addEventListener('click', () => {
+            nodeTreeSearchInput.value = ''; // Clear the input
+            updateGlobalSearchAndHighlight(); // Trigger update
+            nodeTreeSearchInput.focus(); // Keep focus on the search bar
         });
+
 
         // Placeholder for chat and help functionality
         chatBtn.addEventListener('click', () => {
@@ -4042,10 +4434,12 @@
                     imagePreview.src = '';
                     imagePreviewContainer.classList.add('hidden');
                     openHotspotEditorBtn.disabled = true; // Disable hotspot button
+                    currentHotspots = []; // Clear hotspots if primary image is cleared
                 };
                 reader.readAsDataURL(file);
             } else {
                 currentImageBase64 = null;
+                imageUploadInput.value = ''; // Clear file input
                 imagePreview.src = '';
                 imagePreviewContainer.classList.add('hidden');
                 openHotspotEditorBtn.disabled = true; // Disable hotspot button
@@ -4060,6 +4454,37 @@
             imagePreviewContainer.classList.add('hidden');
             openHotspotEditorBtn.disabled = true; // Disable hotspot button
             currentHotspots = []; // Clear hotspots if primary image is cleared
+        });
+
+        // OBJ file upload handling
+        objUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentObjBase64 = e.target.result; // Store Base64 string
+                    objPreviewContainer.classList.remove('hidden');
+                    objPreviewContainer.querySelector('span').textContent = `Local OBJ file selected: ${file.name}`;
+                };
+                reader.onerror = () => {
+                    displayTemporaryMessage('Error reading OBJ file.', 'error');
+                    currentObjBase64 = null;
+                    objPreviewContainer.classList.add('hidden');
+                    objPreviewContainer.querySelector('span').textContent = '';
+                };
+                reader.readAsDataURL(file); // Read file as Base64 data URL
+            } else {
+                currentObjBase64 = null;
+                objPreviewContainer.classList.add('hidden');
+                objPreviewContainer.querySelector('span').textContent = '';
+            }
+        });
+
+        clearObjBtn.addEventListener('click', () => {
+            objUploadInput.value = ''; // Clear file input
+            currentObjBase64 = null;
+            objPreviewContainer.classList.add('hidden');
+            objPreviewContainer.querySelector('span').textContent = '';
         });
 
 
@@ -4093,7 +4518,7 @@
             const files = event.target.files;
             if (files.length > 0) {
                 let filesProcessed = 0;
-                for (let i = 0; i < files.length; i++) {
+                for (let i = 0; i < files.length; i++) { // Corrected loop condition
                     const file = files[i];
                     const reader = new FileReader();
 
@@ -4324,7 +4749,7 @@
             initialWidth = sidebar.offsetWidth;
             sidebar.classList.add('is-resizing'); // Add class for styling
             document.body.style.cursor = 'col-resize'; // Change cursor globally
-            document.body.style.userSelect = 'none'; // Prevent text selection during resize
+              document.body.style.userSelect = 'none'; // Prevent text selection during resize
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -4349,6 +4774,138 @@
             document.body.style.cursor = ''; // Reset cursor
             document.body.style.userSelect = ''; // Re-enable text selection
         });
+
+        // --- Three.js 3D Viewer Logic ---
+        /**
+         * Initializes and renders a 3D OBJ model using Three.js.
+         * @param {HTMLElement} container The DOM element to append the canvas to.
+         * @param {string} objData The Base64 data URI of the OBJ file.
+         */
+        function init3DViewer(container, objData) {
+            // Clear previous content in the container
+            container.innerHTML = '<div class="obj-viewer-loading">Loading 3D Model...</div>';
+
+            // Dispose of existing renderer if it exists to prevent multiple canvases
+            if (renderer) {
+                renderer.dispose();
+                // Dispose of scene and camera if they were previously initialized
+                if (scene) scene.dispose();
+                if (camera) camera = null; // No dispose method for camera directly
+                if (controls) controls.dispose();
+                scene = null;
+                camera = null;
+                renderer = null;
+                controls = null;
+                currentObjMesh = null;
+            }
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0); // Light gray background
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({
+                antialias: true
+            });
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            container.appendChild(renderer.domElement);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(0, 1, 1).normalize();
+            scene.add(directionalLight);
+
+            // OrbitControls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // An animation loop is required when damping is enabled
+            controls.dampingFactor = 0.25;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 1;
+            controls.maxDistance = 10;
+            controls.target.set(0, 0, 0); // Center the controls on the origin
+
+            // OBJ Loader
+            const loader = new THREE.OBJLoader();
+            loader.load(
+                objData, // Pass the Base64 data URI directly
+                function (object) {
+                    // Center the object and scale it to fit the view
+                    const box = new THREE.Box3().setFromObject(object);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    // Calculate scale factor to fit within a certain size (e.g., 2 units)
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 2 / maxDim;
+                    object.scale.set(scale, scale, scale);
+
+                    // Reposition object so its center is at the origin after scaling
+                    object.position.sub(center.multiplyScalar(scale));
+
+                    // Apply a default material if the OBJ has no materials (common for simple OBJs without MTL)
+                    object.traverse(function (child) {
+                        if (child instanceof THREE.Mesh) {
+                            if (!child.material || child.material.length === 0) {
+                                child.material = new THREE.MeshStandardMaterial({
+                                    color: 0x808080,
+                                    roughness: 0.5,
+                                    metalness: 0.1
+                                }); // Grey material
+                            }
+                        }
+                    });
+
+                    scene.add(object);
+                    currentObjMesh = object; // Store reference to the loaded object
+                    const loadingElement = container.querySelector('.obj-viewer-loading');
+                    if (loadingElement) loadingElement.remove(); // Remove loading text
+                },
+                function (xhr) {
+                    // Progress callback
+                    const progress = (xhr.loaded / xhr.total) * 100;
+                    const loadingElement = container.querySelector('.obj-viewer-loading');
+                    if (loadingElement) {
+                        loadingElement.textContent = `Loading 3D Model: ${Math.round(progress)}%`;
+                    }
+                },
+                function (error) {
+                    console.error('An error happened while loading OBJ:', error);
+                    container.innerHTML =
+                        '<div class="obj-viewer-loading text-red-600">Error loading 3D model. Check URL or console for details.</div>';
+                    displayTemporaryMessage('Error loading 3D model. Check console for details.', 'error');
+                }
+            );
+
+            // Animation loop
+            function animate() {
+                if (!renderer) return; // Stop animation if renderer is disposed
+                requestAnimationFrame(animate);
+                controls.update(); // only required if controls.enableDamping is set to true
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle window resize
+            function onWindowResize() {
+                if (!renderer || !camera) return; // Check if elements exist before resizing
+                const newWidth = container.offsetWidth;
+                const newHeight = container.offsetHeight;
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+            }
+            // Attach resize listener only once per viewer initialization
+            // Ensure previous listener is removed if init3DViewer is called multiple times for the same container
+            window.removeEventListener('resize', onWindowResize); // Remove any old listener first
+            window.addEventListener('resize', onWindowResize);
+        }
 
 
         // --- Initial Load ---
