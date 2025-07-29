@@ -1,11 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechHire</title>
+    <title>TECH HIRE</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> 
+     <link rel="stylesheet" href="button.css">
+<script src="button.js"></script>
     <style>
         /* Custom styles for the Inter font */
         body {
@@ -15,17 +17,20 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 10px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
 
         /* Styles for the circular progress bar (Jobs Summary) */
         .progress-ring__circle {
@@ -37,13 +42,36 @@
         .hidden {
             display: none;
         }
+        /* Notification panel styling */
+        #notification-panel {
+            position: absolute;
+            top: 60px; /* Adjust based on header height */
+            right: 10px;
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .notification-item {
+            border-bottom: 1px solid #eee;
+            padding: 0.75rem 0;
+        }
+
+            .notification-item:last-child {
+                border-bottom: none;
+            }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
     <!-- Login Screen -->
     <div id="login-screen" class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Login to Tech Hire</h2>
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Login to TECH HIRE</h2>
         <form id="login-form" class="space-y-4">
             <div>
                 <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
@@ -72,8 +100,8 @@
         <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col rounded-r-lg shadow-lg">
             <div class="p-6 flex items-center justify-between border-b border-gray-800">
                 <div class="flex items-center">
-                    <span class="text-2xl font-bold text-orange-500 mr-2">Tech</span>
-                    <span class="text-xl font-semibold">Hire</span>
+                    <span class="text-2xl font-bold text-orange-500 mr-2">TECH</span>
+                    <span class="text-xl font-semibold">HIRE</span>
                 </div>
                 <button class="text-gray-400 hover:text-white focus:outline-none md:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -179,13 +207,29 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <!-- Notification Icon -->
+                    <div class="relative">
+                        <button id="notification-icon" class="text-gray-500 hover:text-gray-700 focus:outline-none relative">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            <span id="notification-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2 hidden">0</span>
+                        </button>
+                        <!-- Notification Panel -->
+                        <div id="notification-panel" class="hidden">
+                            <h4 class="font-semibold text-gray-800 mb-2">Notifications</h4>
+                            <ul id="notification-list" class="space-y-2 text-sm">
+                                <!-- Notifications will be dynamically added here -->
+                            </ul>
+                            <button id="clear-notifications" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-3 rounded-lg text-xs">Clear All</button>
+                        </div>
+                    </div>
+
                     <!-- Role Selection Dropdown -->
-                    <div class="relative inline-block text-left">
+                    <div id="role-dropdown-container" class="relative inline-block text-left">
                         <select id="role-dropdown" class="block appearance-none bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded-lg shadow leading-tight focus:outline-none focus:shadow-outline text-gray-700 text-sm">
                             <!-- Options will be populated by JavaScript -->
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                         </div>
                     </div>
                     <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md text-sm transition duration-300 ease-in-out">
@@ -194,9 +238,6 @@
 
                     <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h1M3 12H2m8.003-9.127a9.003 9.003 0 017.07 7.07M10.929 18.929a9.003 9.003 0 01-7.07-7.07m14.142 0a9.003 9.003 0 01-7.07 7.07m-4.243-4.243a9.003 9.003 0 017.07-7.07"></path></svg>
-                    </button>
-                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     </button>
                     <div class="flex items-center space-x-2">
                         <img src="https://placehold.co/40x40/FF6347/FFFFFF?text=JD" alt="User Avatar" class="w-10 h-10 rounded-full object-cover">
@@ -208,7 +249,7 @@
             <!-- Dashboard Content Container -->
             <div class="flex-1 p-6 overflow-y-auto custom-scrollbar">
 
-                <!-- Recruiter Dashboard (Default View) -->
+                <!-- Recruiter Dashboard -->
                 <section id="recruiter-dashboard-content" class="hidden">
                     <h1 class="text-2xl font-bold text-gray-800 mb-2">Recruiter Dashboard</h1>
                     <p class="text-gray-500 mb-6">Today is Monday, 8th November 2025</p>
@@ -225,7 +266,7 @@
                                 <option>Daily</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                             </div>
                         </div>
                         <button class="flex items-center bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -251,7 +292,7 @@
                                             <option>Marketing</option>
                                         </select>
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                                         </div>
                                     </div>
                                     <button class="text-blue-600 font-medium text-sm">VIEW ALL ></button>
@@ -269,92 +310,8 @@
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hired</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                Design Head
-                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">18 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">8 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">3 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                Art Lead
-                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">16 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">10 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">30 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                PRODUCT DESIGNER
-                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">88 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">80 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">30 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                Junior UI Designer
-                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">10 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">10 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">6 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                UX Researcher
-                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">90 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">83 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">60 Candidates</span>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
-                                        </tr>
+                                    <tbody id="hiring-table-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Data will be dynamically inserted here by renderRecruiterHiringTable() -->
                                     </tbody>
                                 </table>
                             </div>
@@ -462,7 +419,7 @@
                                         <option>This Month</option>
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                                     </div>
                                 </div>
                                 <div class="relative">
@@ -538,6 +495,45 @@
                             </li>
                         </ul>
                     </div>
+                    <!-- New Requirements Section for Recruiter Dashboard -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4"> found online CV</h3>
+                        <ul id="new-requirements-list" class="space-y-3">
+                            <!-- Requirements will be dynamically added here -->
+                          <!--  <li class="text-gray-600">No new requirements submitted yet.</li>-->
+                        </ul> 
+                                         <div class="button-container">
+               <button onclick="toggleDropdown()">Collect Resumes</button>
+                <div id="platformsDropdown" class="dropdown-content">
+<!-- Platforms will be dynamically added here by JavaScript -->
+     </div>
+                    </div>
+
+                    <!-- Online Resumes Section for Recruiter Dashboard -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <div class="flex justify-between items-center mb-4"> 
+                     
+             </div>
+                           <!-- <h3 class="text-xl font-semibold text-gray-800">Online Resumes Found</h3>-->
+                            <!--<button id="find-online-resume-btn" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-lg text-sm transition duration-300 ease-in-out transform hover:scale-105">
+                                Find New Online Resume
+                            </button>-->
+                        </div>
+                        <ul id="online-resumes-list" class="space-y-3">
+                            <!-- Online resumes will be dynamically added here -->
+                            <li class="text-gray-600">No online resumes found yet.</li>
+                        </ul>
+                    </div>
+                   
+                    <!-- Internal Resumes Section for Recruiter Dashboard -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Internal Resumes</h3>
+                        <ul id="internal-resumes-list" class="space-y-3">
+                            <!-- Internal resumes will be dynamically added here -->
+                            <li class="text-gray-600">No internal resumes available yet.</li>
+                        </ul>
+                    </div>
+
                 </section>
 
                 <!-- Technical Dashboard -->
@@ -545,7 +541,32 @@
                     <h1 class="text-2xl font-bold text-gray-800 mb-2">Technical Dashboard</h1>
                     <p class="text-gray-500 mb-6">Welcome, Technical User! Here are your key tasks and resources.</p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Resumes for Technical Review -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Resumes for Technical Review</h3>
+                        <ul id="resumes-for-review-list" class="space-y-3">
+                            <li class="text-gray-600">No resumes awaiting review.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Hired Candidates -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Hired Candidates</h3>
+                        <ul id="hired-candidates-list" class="space-y-3">
+                            <li class="text-gray-600">No candidates hired yet.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Rejected Candidates -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Rejected Candidates</h3>
+                        <ul id="rejected-candidates-list" class="space-y-3">
+                            <li class="text-gray-600">No candidates rejected yet.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Existing sections on Technical Dashboard -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div class="bg-white rounded-lg shadow-md p-6">
                             <h3 class="text-xl font-semibold text-gray-800 mb-4">Assigned Projects</h3>
                             <ul class="list-disc list-inside text-gray-700 space-y-2">
@@ -583,6 +604,28 @@
                                 </div>
                             </li>
                         </ul>
+                    </div>
+
+                    <!-- Requirement Form for Technical Dashboard -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Create New Requirement</h3>
+                        <form id="new-requirement-form" class="space-y-4">
+                            <div>
+                                <label for="job-title" class="block text-gray-700 text-sm font-bold mb-2">Job Title:</label>
+                                <input type="text" id="job-title" name="job-title" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500" placeholder="e.g., Senior Software Engineer" required>
+                            </div>
+                            <div>
+                                <label for="department" class="block text-gray-700 text-sm font-bold mb-2">Department:</label>
+                                <input type="text" id="department" name="department" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500" placeholder="e.g., Engineering" required>
+                            </div>
+                            <div>
+                                <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Job Description:</label>
+                                <textarea id="description" name="description" rows="4" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500" placeholder="Provide a detailed job description..." required></textarea>
+                            </div>
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out transform hover:scale-105">
+                                Submit Requirement
+                            </button>
+                        </form>
                     </div>
                 </section>
 
@@ -630,6 +673,22 @@
                             </li>
                         </ul>
                     </div>
+
+                    <!-- Recruiter Dashboard View for Admin -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Recruiter Dashboard Overview</h3>
+                        <div id="admin-recruiter-view">
+                            <!-- Recruiter dashboard content will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Technical Dashboard View for Admin -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Technical Dashboard Overview</h3>
+                        <div id="admin-technical-view">
+                            <!-- Technical dashboard content will be loaded here -->
+                        </div>
+                    </div>
                 </section>
 
             </div>
@@ -645,18 +704,72 @@
         const passwordInput = document.getElementById('password');
         const loginError = document.getElementById('login-error');
         const logoutButton = document.getElementById('logout-button');
-        const roleDropdown = document.getElementById('role-dropdown'); // Re-added dropdown
+        const roleDropdownContainer = document.getElementById('role-dropdown-container'); // New: Container for the dropdown
+        const roleDropdown = document.getElementById('role-dropdown');
 
         const recruiterDashboardContent = document.getElementById('recruiter-dashboard-content');
         const technicalDashboardContent = document.getElementById('technical-dashboard-content');
         const adminDashboardContent = document.getElementById('admin-dashboard-content');
 
+        // Elements for requirement form and display
+        const newRequirementForm = document.getElementById('new-requirement-form');
+        const jobTitleInput = document.getElementById('job-title');
+        const departmentInput = document.getElementById('department');
+        const descriptionInput = document.getElementById('description');
+        const newRequirementsList = document.getElementById('new-requirements-list');
+
+        // Elements for Notification System
+        const notificationIcon = document.getElementById('notification-icon');
+        const notificationCountSpan = document.getElementById('notification-count');
+        const notificationPanel = document.getElementById('notification-panel');
+        const notificationList = document.getElementById('notification-list');
+        const clearNotificationsButton = document.getElementById('clear-notifications');
+
+        // New elements for Online and Internal Resumes
+        const findOnlineResumeBtn = document.getElementById('find-online-resume-btn'); // New button
+        const onlineResumesList = document.getElementById('online-resumes-list');
+        const internalResumesList = document.getElementById('internal-resumes-list');
+
+        // New elements for Technical Dashboard resume sections
+        const resumesForReviewList = document.getElementById('resumes-for-review-list');
+        const hiredCandidatesList = document.getElementById('hired-candidates-list');
+        const rejectedCandidatesList = document.getElementById('rejected-candidates-list');
+
+        // New elements for Admin Dashboard views
+        const adminRecruiterView = document.getElementById('admin-recruiter-view');
+        const adminTechnicalView = document.getElementById('admin-technical-view');
+
+
         // Hardcoded user credentials for demonstration
         const users = {
-            recruiter: { password: 'pass', role: 'recruiter' }, // Store role as lowercase for matching
+            recruiter: { password: 'pass', role: 'recruiter' },
             technical: { password: 'pass', role: 'technical' },
             admin: { password: 'pass', role: 'admin' }
         };
+
+        // Global arrays to store data (client-side only for this example)
+        const submittedRequirements = [];
+        const notifications = []; // Stores notification objects
+        // onlineResumes now includes a status and will be dynamically updated
+        let onlineResumes = [
+            { id: 'ol1', name: 'Alice Johnson', source: 'LinkedIn', skills: 'React, Node.js, AWS', dateFound: '2025-07-20', status: 'pending' },
+            { id: 'ol2', name: 'Bob Williams', source: 'Indeed', skills: 'Python, Django, SQL', dateFound: '2025-07-22', status: 'pending' },
+            { id: 'ol3', name: 'Charlie Brown', source: 'Glassdoor', skills: 'Java, Spring Boot, Microservices', dateFound: '2025-07-25', status: 'pending' }
+        ];
+        const internalResumes = [ // Sample data for internal resumes
+            { id: 'in1', name: 'David Lee', currentRole: 'Junior Developer', skills: 'JavaScript, HTML, CSS', department: 'Engineering' },
+            { id: 'in2', name: 'Eve Davis', currentRole: 'Marketing Assistant', skills: 'SEO, Content Creation', department: 'Marketing' }
+        ];
+
+        // Data for Recruiter Hiring Table
+        const hiringData = [
+            { job: 'Design Head', totalApplications: 88, newApplied: 18, screening: 8, interview: 3, test: 0, hired: 0 },
+            { job: 'Art Lead', totalApplications: 88, newApplied: 16, screening: 10, interview: 30, test: 0, hired: 0 },
+            { job: 'PRODUCT DESIGNER', totalApplications: 88, newApplied: 88, screening: 80, interview: 30, test: 0, hired: 0 },
+            { job: 'Junior UI Designer', totalApplications: 88, newApplied: 10, screening: 10, interview: 6, test: 0, hired: 0 },
+            { job: 'UX Researcher', totalApplications: 88, newApplied: 90, screening: 83, interview: 60, test: 0, hired: 0 },
+        ];
+
 
         // Function to hide all dashboard content sections
         function hideAllDashboards() {
@@ -669,15 +782,41 @@
         function showDashboard(role) {
             hideAllDashboards(); // Hide all dashboards first
 
+            // Control visibility of the role dropdown based on the active dashboard
+            if (role === 'admin') {
+                roleDropdownContainer.classList.remove('hidden');
+            } else {
+                roleDropdownContainer.classList.add('hidden');
+            }
+
             switch (role) {
                 case 'recruiter':
                     recruiterDashboardContent.classList.remove('hidden');
+                    renderRecruiterHiringTable(); // Render hiring table
+                    renderSubmittedRequirements(); // Render requirements when recruiter dashboard is shown
+                    renderOnlineResumes(); // Render online resumes for recruiter
+                    renderInternalResumes(); // Render internal resumes
                     break;
                 case 'technical':
                     technicalDashboardContent.classList.remove('hidden');
+                    renderResumesForTechnicalReview(); // Render resumes for technical review
+                    renderHiredCandidates(); // Render hired candidates
+                    renderRejectedCandidates(); // Render rejected candidates
                     break;
                 case 'admin':
                     adminDashboardContent.classList.remove('hidden');
+                    // Populate admin view with recruiter and technical dashboard content
+                    // Ensure all sub-render functions are called before getting HTML for admin view
+                    renderRecruiterHiringTable();
+                    renderSubmittedRequirements();
+                    renderOnlineResumes();
+                    renderInternalResumes();
+                    renderResumesForTechnicalReview();
+                    renderHiredCandidates();
+                    renderRejectedCandidates();
+
+                    adminRecruiterView.innerHTML = getRecruiterDashboardHTMLContent();
+                    adminTechnicalView.innerHTML = getTechnicalDashboardHTMLContent();
                     break;
                 default:
                     console.error("Unknown role:", role);
@@ -689,10 +828,8 @@
 
         // Function to populate the role dropdown
         function populateRoleDropdown(initialRole) {
-            // Clear existing options
-            roleDropdown.innerHTML = '';
+            roleDropdown.innerHTML = ''; // Clear existing options
 
-            // Define all possible roles to be displayed in the dropdown
             const roles = [
                 { value: 'recruiter', text: 'Recruiter Dashboard' },
                 { value: 'technical', text: 'Technical Dashboard' },
@@ -706,8 +843,251 @@
                 roleDropdown.appendChild(option);
             });
 
-            // Set the dropdown to the initial role after login
             roleDropdown.value = initialRole;
+        }
+
+        // Function to render recruiter hiring table
+        function renderRecruiterHiringTable() {
+            const tableBody = document.getElementById('hiring-table-body');
+            if (!tableBody) return; // Exit if element not found
+
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            hiringData.forEach(rowData => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                            ${rowData.job}
+                            <div class="text-xs text-gray-500">TOTAL APPLICATION ${rowData.totalApplications}</div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">${rowData.newApplied} Candidates</span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">${rowData.screening} Candidates</span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">${rowData.interview} Candidates</span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            ${rowData.test > 0 ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">${rowData.test} Candidates</span>` : ''}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            ${rowData.hired > 0 ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">${rowData.hired} Candidates</span>` : ''}
+                        </td>
+                    `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+
+        // Function to render submitted requirements on the Recruiter Dashboard
+        function renderSubmittedRequirements() {
+            newRequirementsList.innerHTML = ''; // Clear current list
+
+            if (submittedRequirements.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'text-gray-600';
+                li.textContent = 'No new requirements submitted yet.';
+                newRequirementsList.appendChild(li);
+            } else {
+                submittedRequirements.forEach((req) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col bg-blue-50 p-4 rounded-lg border border-blue-200';
+                    li.innerHTML = `
+                            <div class="font-semibold text-blue-800">Job Title: ${req.jobTitle}</div>
+                            <div class="text-sm text-gray-700">Department: ${req.department}</div>
+                            <div class="text-sm text-gray-600 mt-1">${req.description}</div>
+                            <div class="text-xs text-gray-500 mt-2">Submitted: ${req.timestamp}</div>
+                        `;
+                    newRequirementsList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to render online resumes on the Recruiter Dashboard
+        function renderOnlineResumes() {
+            onlineResumesList.innerHTML = ''; // Clear current list
+
+            if (onlineResumes.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'text-gray-600';
+                li.textContent = 'No online resumes found yet.';
+                onlineResumesList.appendChild(li);
+            } else {
+                onlineResumes.forEach((resume) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col bg-green-50 p-4 rounded-lg border border-green-200';
+                    li.innerHTML = `
+                            <div class="font-semibold text-green-800">Candidate: ${resume.name}</div>
+                            <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                            <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                            <div class="text-xs text-gray-500 mt-2">Found: ${resume.dateFound}</div>
+                            <div class="text-xs text-gray-500 mt-1">Status: <span class="font-bold capitalize">${resume.status}</span></div>
+                        `;
+                    onlineResumesList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to render internal resumes on the Recruiter Dashboard
+        function renderInternalResumes() {
+            internalResumesList.innerHTML = ''; // Clear current list
+
+            if (internalResumes.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'text-gray-600';
+                li.textContent = 'No internal resumes available yet.';
+                internalResumesList.appendChild(li);
+            } else {
+                internalResumes.forEach((resume) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col bg-yellow-50 p-4 rounded-lg border border-yellow-200';
+                    li.innerHTML = `
+                            <div class="font-semibold text-yellow-800">Employee: ${resume.name}</div>
+                            <div class="text-sm text-gray-700">Current Role: ${resume.currentRole}</div>
+                            <div class="text-sm text-gray-600 mt-1">Department: ${resume.department}</div>
+                            <div class="text-xs text-gray-500 mt-2">Skills: ${resume.skills}</div>
+                        `;
+                    internalResumesList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to render resumes for technical review
+        function renderResumesForTechnicalReview() {
+            resumesForReviewList.innerHTML = ''; // Clear current list
+            const pendingResumes = onlineResumes.filter(resume => resume.status === 'pending');
+
+            if (pendingResumes.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'text-gray-600';
+                li.textContent = 'No resumes awaiting review.';
+                resumesForReviewList.appendChild(li);
+            } else {
+                pendingResumes.forEach((resume) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col bg-purple-50 p-4 rounded-lg border border-purple-200';
+                    li.innerHTML = `
+                            <div class="font-semibold text-purple-800">Candidate: ${resume.name}</div>
+                            <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                            <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                            <div class="text-xs text-gray-500 mt-2">Found: ${resume.dateFound}</div>
+                            <div class="flex space-x-2 mt-3">
+                                <button data-id="${resume.id}" data-action="hire" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-lg text-xs transition duration-300 ease-in-out transform hover:scale-105">Hire</button>
+                                <button data-id="${resume.id}" data-action="not-hire" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg text-xs transition duration-300 ease-in-out transform hover:scale-105">Not Hire</button>
+                            </div>
+                        `;
+                    resumesForReviewList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to render hired candidates
+        function renderHiredCandidates() {
+            hiredCandidatesList.innerHTML = ''; // Clear current list
+            const hired = onlineResumes.filter(resume => resume.status === 'hired');
+
+            if (hired.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'text-gray-600';
+                li.textContent = 'No candidates hired yet.';
+                hiredCandidatesList.appendChild(li);
+            } else {
+                hired.forEach((resume) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col bg-blue-100 p-4 rounded-lg border border-blue-300';
+                    li.innerHTML = `
+                            <div class="font-semibold text-blue-800">Candidate: ${resume.name}</div>
+                            <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                            <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                            <div class="text-xs text-gray-500 mt-2">Hired on: ${new Date().toLocaleDateString()}</div>
+                        `;
+                    hiredCandidatesList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to render rejected candidates
+        function renderRejectedCandidates() {
+            rejectedCandidatesList.innerHTML = ''; // Clear current list
+            const rejected = onlineResumes.filter(resume => resume.status === 'rejected');
+
+            if (rejected.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'text-gray-600';
+                li.textContent = 'No candidates rejected yet.';
+                rejectedCandidatesList.appendChild(li);
+            } else {
+                rejected.forEach((resume) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col bg-red-100 p-4 rounded-lg border border-red-300';
+                    li.innerHTML = `
+                            <div class="font-semibold text-red-800">Candidate: ${resume.name}</div>
+                            <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                            <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                            <div class="text-xs text-gray-500 mt-2">Rejected on: ${new Date().toLocaleDateString()}</div>
+                        `;
+                    rejectedCandidatesList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to update the notification count badge
+        function updateNotificationCount() {
+            const unreadNotifications = notifications.filter(n => !n.read).length;
+            if (unreadNotifications > 0) {
+                notificationCountSpan.textContent = unreadNotifications;
+                notificationCountSpan.classList.remove('hidden');
+            } else {
+                notificationCountSpan.classList.add('hidden');
+            }
+        }
+
+        // Function to render notifications in the panel
+        function renderNotifications() {
+            notificationList.innerHTML = ''; // Clear current list
+
+            if (notifications.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'text-gray-600 text-center py-4';
+                li.textContent = 'No new notifications.';
+                notificationList.appendChild(li);
+            } else {
+                notifications.forEach((note) => {
+                    const li = document.createElement('li');
+                    li.className = `notification-item ${note.read ? 'text-gray-500' : 'font-semibold text-gray-800'}`;
+                    li.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span>${note.message}</span>
+                                <span class="text-xs text-gray-400">${note.timestampShort}</span>
+                            </div>
+                        `;
+                    li.addEventListener('click', () => {
+                        if (!note.read) {
+                            note.read = true;
+                            renderNotifications(); // Re-render to update styling
+                            updateNotificationCount();
+                        }
+                    });
+                    notificationList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to add a new notification
+        function addNotification(message, targetRole = null) {
+            const newNote = {
+                id: Date.now(), // Simple unique ID
+                message: message,
+                timestamp: new Date().toLocaleString(),
+                timestampShort: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                read: false,
+                targetRole: targetRole // Optional: for whom the notification is intended
+            };
+            notifications.unshift(newNote); // Add to the beginning of the array
+            updateNotificationCount();
+            renderNotifications(); // Update the displayed list
         }
 
         // Function to show the login screen and hide the dashboard
@@ -715,14 +1095,336 @@
             loginScreen.classList.remove('hidden');
             dashboardContainer.classList.add('hidden');
             loginForm.reset(); // Clear the form fields
+            usernameInput.value = ''; // Clear username
+            passwordInput.value = ''; // Clear password
             loginError.classList.add('hidden'); // Hide any previous error messages
-            // No need to reset dropdown here, as it will be populated on next login
+            notificationPanel.classList.add('hidden'); // Hide notification panel on logout
+            // In a real app, notifications would be cleared/fetched per user from a backend.
         }
 
         // Function to show the dashboard and hide the login screen
         function showMainDashboard() {
             loginScreen.classList.add('hidden');
             dashboardContainer.classList.remove('hidden');
+        }
+
+        // Function to generate HTML content for Recruiter Dashboard sections for Admin View
+        function getRecruiterDashboardHTMLContent() {
+            return `
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">Hiring Overview</h4>
+                    <div class="overflow-x-auto bg-white rounded-lg shadow-md p-4 mb-4">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jobs</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New Applied</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screening</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interview</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hired</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${hiringData.map(rowData => `
+                                    <tr>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            ${rowData.job}
+                                            <div class="text-xs text-gray-500">TOTAL APPLICATION ${rowData.totalApplications}</div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">${rowData.newApplied} Candidates</span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">${rowData.screening} Candidates</span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">${rowData.interview} Candidates</span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                            ${rowData.test > 0 ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">${rowData.test} Candidates</span>` : ''}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                            ${rowData.hired > 0 ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">${rowData.hired} Candidates</span>` : ''}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Jobs Summary & Employee Overview</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-semibold text-gray-800">Jobs Summary</h3>
+                            </div>
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="relative w-32 h-32 mb-4">
+                                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                                        <circle class="text-gray-200 stroke-current" stroke-width="10" cx="50" cy="50" r="40" fill="transparent"></circle>
+                                        <circle class="progress-ring__circle text-purple-500 stroke-current" stroke-width="10" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="62.8"></circle>
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="text-3xl font-bold text-gray-800">133</span>
+                                        <span class="text-sm text-gray-500">TOTAL JOBS</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-sm text-gray-700 w-full">
+                                    <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>80 PUBLISHED</div>
+                                    <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-yellow-400 mr-2"></span>20 ON HOLD</div>
+                                    <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>18 INTERNAL</div>
+                                    <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>15 CLOSED</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-semibold text-gray-800">Employee</h3>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-900">Design Team</span>
+                                        <span class="text-sm text-gray-500">TOTAL MEMBER 28</span>
+                                    </div>
+                                    <div class="flex -space-x-2 overflow-hidden">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=A" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=B" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=C" alt="Avatar">
+                                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+24</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-900">Development Team</span>
+                                        <span class="text-sm text-gray-500">TOTAL MEMBER 16</span>
+                                    </div>
+                                    <div class="flex -space-x-2 overflow-hidden">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=D" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=E" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=F" alt="Avatar">
+                                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+13</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-900">Finance Team</span>
+                                        <span class="text-sm text-gray-500">TOTAL MEMBER 10</span>
+                                    </div>
+                                    <div class="flex -space-x-2 overflow-hidden">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=G" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=H" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=I" alt="Avatar">
+                                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+7</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-900">Sales Team</span>
+                                        <span class="text-sm text-gray-500">TOTAL MEMBER 30</span>
+                                    </div>
+                                    <div class="flex -space-x-2 overflow-hidden">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=J" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=K" alt="Avatar">
+                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=L" alt="Avatar">
+                                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+27</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Recruiter Tasks</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <ul class="space-y-4">
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full" disabled>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">09:00 - 10:00 AM</div>
+                                        <div class="text-gray-600">Interview with candidates from product designer application</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full" disabled>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">10:30 - 12:00 AM</div>
+                                        <div class="text-gray-600">UI Design candidate screening</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full" disabled>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">13:30 - 14:00 PM</div>
+                                        <div class="text-gray-600">Submit freelance recruitment result</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">New Requirements (Recruiter View)</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <ul class="space-y-3">
+                            ${submittedRequirements.length === 0 ? '<li class="text-gray-600">No new requirements submitted yet.</li>' :
+                    submittedRequirements.map(req => `
+                                    <li class="flex flex-col bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                        <div class="font-semibold text-blue-800">Job Title: ${req.jobTitle}</div>
+                                        <div class="text-sm text-gray-700">Department: ${req.department}</div>
+                                        <div class="text-sm text-gray-600 mt-1">${req.description}</div>
+                                        <div class="text-xs text-gray-500 mt-2">Submitted: ${req.timestamp}</div>
+                                    </li>
+                                `).join('')
+                }
+                        </ul>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Online Resumes (Recruiter View)</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <ul class="space-y-3">
+                            ${onlineResumes.length === 0 ? '<li class="text-gray-600">No online resumes found yet.</li>' :
+                    onlineResumes.map(resume => `
+                                    <li class="flex flex-col bg-green-50 p-4 rounded-lg border border-green-200">
+                                        <div class="font-semibold text-green-800">Candidate: ${resume.name}</div>
+                                        <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                                        <div class="text-xs text-gray-500 mt-2">Found: ${resume.dateFound}</div>
+                                        <div class="text-xs text-gray-500 mt-1">Status: <span class="font-bold capitalize">${resume.status}</span></div>
+                                    </li>
+                                `).join('')
+                }
+                        </ul>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Internal Resumes (Recruiter View)</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <ul class="space-y-3">
+                            ${internalResumes.length === 0 ? '<li class="text-gray-600">No internal resumes available yet.</li>' :
+                    internalResumes.map(resume => `
+                                    <li class="flex flex-col bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                                        <div class="font-semibold text-yellow-800">Employee: ${resume.name}</div>
+                                        <div class="text-sm text-gray-700">Current Role: ${resume.currentRole}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Department: ${resume.department}</div>
+                                        <div class="text-xs text-gray-500 mt-2">Skills: ${resume.skills}</div>
+                                    </li>
+                                `).join('')
+                }
+                        </ul>
+                    </div>
+                `;
+        }
+
+        // Function to generate HTML content for Technical Dashboard sections for Admin View
+        function getTechnicalDashboardHTMLContent() {
+            const pendingResumes = onlineResumes.filter(resume => resume.status === 'pending');
+            const hired = onlineResumes.filter(resume => resume.status === 'hired');
+            const rejected = onlineResumes.filter(resume => resume.status === 'rejected');
+
+            return `
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">Resumes for Technical Review</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6 mb-4">
+                        <ul class="space-y-3">
+                            ${pendingResumes.length === 0 ? '<li class="text-gray-600">No resumes awaiting review.</li>' :
+                    pendingResumes.map(resume => `
+                                    <li class="flex flex-col bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                        <div class="font-semibold text-purple-800">Candidate: ${resume.name}</div>
+                                        <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                                        <div class="text-xs text-gray-500 mt-2">Found: ${resume.dateFound}</div>
+                                        <div class="flex space-x-2 mt-3">
+                                            <!-- Buttons are non-functional in admin view snapshot -->
+                                            <span class="text-gray-500 text-xs">Actionable in Technical Dashboard</span>
+                                        </div>
+                                    </li>
+                                `).join('')
+                }
+                        </ul>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Hired Candidates</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6 mb-4">
+                        <ul class="space-y-3">
+                            ${hired.length === 0 ? '<li class="text-gray-600">No candidates hired yet.</li>' :
+                    hired.map(resume => `
+                                    <li class="flex flex-col bg-blue-100 p-4 rounded-lg border border-blue-300">
+                                        <div class="font-semibold text-blue-800">Candidate: ${resume.name}</div>
+                                        <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                                        <div class="text-xs text-gray-500 mt-2">Hired on: ${new Date().toLocaleDateString()}</div>
+                                    </li>
+                                `).join('')
+                }
+                        </ul>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Rejected Candidates</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6 mb-4">
+                        <ul class="space-y-3">
+                            ${rejected.length === 0 ? '<li class="text-gray-600">No candidates rejected yet.</li>' :
+                    rejected.map(resume => `
+                                    <li class="flex flex-col bg-red-100 p-4 rounded-lg border border-red-300">
+                                        <div class="font-semibold text-red-800">Candidate: ${resume.name}</div>
+                                        <div class="text-sm text-gray-700">Source: ${resume.source}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Skills: ${resume.skills}</div>
+                                        <div class="text-xs text-gray-500 mt-2">Rejected on: ${new Date().toLocaleDateString()}</div>
+                                    </li>
+                                `).join('')
+                }
+                        </ul>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Assigned Projects & Resources</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Assigned Projects</h3>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>Develop new API endpoint for user authentication</li>
+                                <li>Fix bug in payment gateway integration</li>
+                                <li>Code review for "Feature X" branch</li>
+                                <li>Research new database technologies</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Technical Resources</h3>
+                            <ul class="list-disc list-inside text-blue-600 space-y-2">
+                                <li><a href="#" class="hover:underline">API Documentation</a></li>
+                                <li><a href="#" class="hover:underline">Codebase Guidelines</a></li>
+                                <li><a href="#" class="hover:underline">Internal Wiki</a></li>
+                                <li><a href="#" class="hover:underline">Stack Overflow (Internal)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Recent Commits</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <ul class="space-y-3">
+                            <li class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <span class="text-green-600 mr-3">✓</span>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-800">feat: Add user profile update functionality</div>
+                                    <div class="text-sm text-gray-600">by John Doe - 2 hours ago</div>
+                                </div>
+                            </li>
+                            <li class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <span class="text-green-600 mr-3">✓</span>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-800">fix: Resolve critical bug in login flow</div>
+                                    <div class="text-sm text-gray-600">by Jane Smith - yesterday</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Create New Requirement</h4>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <!-- This form is non-functional in admin view snapshot -->
+                        <p class="text-gray-600">Form for creating new requirements is available in the Technical Dashboard.</p>
+                    </div>
+                `;
         }
 
         // Event Listener for login form submission
@@ -733,13 +1435,12 @@
             const password = passwordInput.value.trim();
 
             if (users[username] && users[username].password === password) {
-                // Successful login
                 showMainDashboard();
                 const userRole = users[username].role;
-                populateRoleDropdown(userRole); // Populate and set dropdown to logged-in user's role
-                showDashboard(userRole); // Show the dashboard corresponding to the logged-in user
+                populateRoleDropdown(userRole);
+                showDashboard(userRole); // This will now correctly hide/show the dropdown
+                updateNotificationCount(); // Initial update of notification count
             } else {
-                // Failed login
                 loginError.classList.remove('hidden');
             }
         });
@@ -748,13 +1449,132 @@
         roleDropdown.addEventListener('change', (event) => {
             const selectedRole = event.target.value;
             showDashboard(selectedRole);
+            notificationPanel.classList.add('hidden'); // Hide panel when switching dashboards
+        });
+
+        // Event Listener for new requirement form submission (Technical Dashboard)
+        newRequirementForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const jobTitle = jobTitleInput.value.trim();
+            const department = departmentInput.value.trim();
+            const description = descriptionInput.value.trim();
+
+            if (jobTitle && department && description) {
+                const newRequirement = {
+                    jobTitle: jobTitle,
+                    department: department,
+                    description: description,
+                    timestamp: new Date().toLocaleString()
+                };
+                submittedRequirements.push(newRequirement);
+                addNotification(`New requirement for ${jobTitle} in ${department} submitted by Technical Team.`, 'recruiter');
+                newRequirementForm.reset(); // Clear form fields
+                // Re-render recruiter dashboard if it's currently visible
+                if (!recruiterDashboardContent.classList.contains('hidden')) {
+                    renderSubmittedRequirements();
+                }
+                // Update admin view if active
+                if (!adminDashboardContent.classList.contains('hidden')) {
+                    adminRecruiterView.innerHTML = getRecruiterDashboardHTMLContent();
+                }
+            } else {
+                addNotification('Please fill in all fields to submit a new requirement.', null);
+            }
+        });
+
+        // Event listener for "Find New Online Resume" button (Recruiter Dashboard)
+        findOnlineResumeBtn.addEventListener('click', () => {
+            const resumeId = `ol${onlineResumes.length + 1}`;
+            const newResume = {
+                id: resumeId,
+                name: `Candidate ${onlineResumes.length + 1}`,
+                source: 'Naukri.com',
+                skills: 'JavaScript, HTML, CSS, UI/UX',
+                dateFound: new Date().toLocaleDateString(),
+                status: 'pending' // Initial status
+            };
+            onlineResumes.push(newResume);
+            addNotification(`Recruiter found a new online resume for ${newResume.name} from ${newResume.source}.`, 'technical');
+            renderOnlineResumes(); // Update recruiter's view
+            // If technical dashboard is active, also update its view
+            if (!technicalDashboardContent.classList.contains('hidden')) {
+                renderResumesForTechnicalReview();
+            }
+            // Update admin view if active
+            if (!adminDashboardContent.classList.contains('hidden')) {
+                adminRecruiterView.innerHTML = getRecruiterDashboardHTMLContent();
+                adminTechnicalView.innerHTML = getTechnicalDashboardHTMLContent();
+            }
+        });
+
+        // Event listener for Hire/Not Hire buttons (Technical Dashboard) - using event delegation
+        resumesForReviewList.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.tagName === 'BUTTON') {
+                const resumeId = target.dataset.id;
+                const action = target.dataset.action;
+
+                const resumeIndex = onlineResumes.findIndex(r => r.id === resumeId);
+                if (resumeIndex > -1) {
+                    const resume = onlineResumes[resumeIndex];
+                    if (action === 'hire') {
+                        resume.status = 'hired';
+                        addNotification(`Technical team hired ${resume.name}.`, 'recruiter');
+                    } else if (action === 'not-hire') {
+                        resume.status = 'rejected';
+                        addNotification(`Technical team rejected ${resume.name}.`, 'recruiter');
+                    }
+                    // Re-render all relevant sections on the technical dashboard
+                    renderResumesForTechnicalReview();
+                    renderHiredCandidates();
+                    renderRejectedCandidates();
+                    // Also update recruiter's view if they are currently logged in
+                    if (!recruiterDashboardContent.classList.contains('hidden')) {
+                        renderOnlineResumes();
+                    }
+                    // Update admin view if active
+                    if (!adminDashboardContent.classList.contains('hidden')) {
+                        adminRecruiterView.innerHTML = getRecruiterDashboardHTMLContent();
+                        adminTechnicalView.innerHTML = getTechnicalDashboardHTMLContent();
+                    }
+                }
+            }
+        });
+
+
+        // Event listener for notification icon click
+        notificationIcon.addEventListener('click', () => {
+            notificationPanel.classList.toggle('hidden');
+            // Mark all currently visible notifications as read when the panel is opened
+            notifications.forEach(n => n.read = true);
+            renderNotifications(); // Re-render to update styling
+            updateNotificationCount(); // Update count to 0
+        });
+
+        // Event listener for clear all notifications button
+        clearNotificationsButton.addEventListener('click', () => {
+            notifications.length = 0; // Clear the array
+            renderNotifications();
+            updateNotificationCount();
+        });
+
+        // Close notification panel if clicked outside
+        document.addEventListener('click', (event) => {
+            if (!notificationPanel.contains(event.target) && !notificationIcon.contains(event.target) && !notificationPanel.classList.contains('hidden')) {
+                notificationPanel.classList.add('hidden');
+            }
         });
 
         // Event Listener for logout button
         logoutButton.addEventListener('click', showLoginScreen);
 
         // Initialize: Show the login screen on page load
-        document.addEventListener('DOMContentLoaded', showLoginScreen);
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoginScreen();
+            renderNotifications(); // Initial render of notifications (will be empty)
+            updateNotificationCount(); // Initial update of notification count (will be 0)
+        });
 
         // Example for the Jobs Summary progress ring (static value for demonstration)
         // This will only apply to the recruiter dashboard's Jobs Summary.
